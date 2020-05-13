@@ -22,6 +22,8 @@
 	foodtype = MEAT
 	grind_results = list()
 	var/static/chick_count = 0 //I copied this from the chicken_count (note the "en" in there) variable from chicken code.
+	var/golden = FALSE //used for some edge cases with golden eggs
+	var/chick = /mob/living/simple_animal/chick
 	value = FOOD_JUNK
 
 /obj/item/reagent_containers/food/snacks/egg/gland
@@ -35,7 +37,7 @@
 	add_atom_colour(color, FIXED_COLOUR_PRIORITY)
 
 /obj/item/reagent_containers/food/snacks/egg/throw_impact(atom/hit_atom, datum/thrownthing/throwingdatum)
-	if(!..()) //was it caught by a mob?
+	if(!..() && !golden) //was it caught by a mob? also golden eggs can't break!
 		var/turf/T = get_turf(hit_atom)
 		new /obj/effect/decal/cleanable/food/egg_smudge(T)
 		if(prob(13)) //Roughly a 1/8 (12.5%) chance to make a chick, as in Minecraft. I decided not to include the chances for the creation of multiple chicks from the impact of one egg, since that'd probably require nested prob()s or something (and people might think that it was a bug, anyway).
@@ -46,7 +48,7 @@
 		qdel(src)
 
 /obj/item/reagent_containers/food/snacks/egg/attackby(obj/item/W, mob/user, params)
-	if(istype(W, /obj/item/toy/crayon))
+	if((istype(W, /obj/item/toy/crayon)) && !golden) //you can't die gold using crayons
 		var/obj/item/toy/crayon/C = W
 		var/clr = C.crayon_color
 
@@ -56,13 +58,24 @@
 
 		to_chat(usr, "<span class='notice'>You colour [src] with [W].</span>")
 		icon_state = "egg-[clr]"
-	else if(istype(W, /obj/item/stamp/clown))
+	else if((istype(W, /obj/item/stamp/clown)) && !golden)
 		var/clowntype = pick("grock", "grimaldi", "rainbow", "chaos", "joker", "sexy", "standard", "bobble", "krusty", "bozo", "pennywise", "ronald", "jacobs", "kelly", "popov", "cluwne")
 		icon_state = "egg-clown-[clowntype]"
 		desc = "An egg that has been decorated with the grotesque, robustable likeness of a clown's face. "
 		to_chat(usr, "<span class='notice'>You stamp [src] with [W], creating an artistic and not remotely horrifying likeness of clown makeup.</span>")
 	else
 		..()
+
+/obj/item/reagent_containers/food/snacks/egg/gold
+	name = "golden egg"
+	desc = "A golden egg! It's warm to the touch."
+	icon_state = "egg-gold"
+	list_reagents = list(/datum/reagent/gold = 10)
+	golden = TRUE
+	chick = /mob/living/simple_animal/chick/golden
+	custom_materials = list(/datum/material/gold=250)
+	throwforce = 10 //ouch
+	value = FOOD_LEGENDARY
 
 /obj/item/reagent_containers/food/snacks/egg/blue
 	icon_state = "egg-blue"

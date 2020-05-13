@@ -233,6 +233,7 @@
 /mob/living/simple_animal/chick
 	name = "\improper chick"
 	desc = "Adorable! They make such a racket though."
+	icon = 'icons/mob/chicken.dmi'
 	icon_state = "chick"
 	icon_living = "chick"
 	icon_dead = "chick_dead"
@@ -262,6 +263,7 @@
 	pass_flags = PASSTABLE | PASSGRILLE | PASSMOB
 	mob_size = MOB_SIZE_TINY
 	gold_core_spawnable = FRIENDLY_SPAWN
+	var/chicken = /mob/living/simple_animal/chicken
 
 	footstep_type = FOOTSTEP_MOB_CLAW
 
@@ -277,7 +279,7 @@
 	if(!stat && !ckey)
 		amount_grown += rand(1,2)
 		if(amount_grown >= 100)
-			new /mob/living/simple_animal/chicken(src.loc)
+			new chicken(src.loc)
 			qdel(src)
 
 /mob/living/simple_animal/chick/holo/Life()
@@ -289,6 +291,7 @@
 	desc = "Hopefully the eggs are good this season."
 	gender = FEMALE
 	mob_biotypes = MOB_ORGANIC|MOB_BEAST
+	icon = 'icons/mob/chicken.dmi'
 	icon_state = "chicken_brown"
 	icon_living = "chicken_brown"
 	icon_dead = "chicken_brown_dead"
@@ -374,12 +377,31 @@
 		amount_grown += rand(1,2)
 		if(amount_grown >= 100)
 			visible_message("<span class='notice'>[src] hatches with a quiet cracking sound.</span>")
-			new /mob/living/simple_animal/chick(get_turf(src))
+			new chick(get_turf(src))
 			STOP_PROCESSING(SSobj, src)
 			qdel(src)
 	else
 		STOP_PROCESSING(SSobj, src)
 
+/mob/living/simple_animal/chick/golden
+	name = "\improper golden chick"
+	desc = "Adorable! They make such a racket though."
+	health = 10
+	maxHealth = 10
+	chicken = /mob/living/simple_animal/chicken/golden
+
+/mob/living/simple_animal/chicken/golden
+	name = "\improper golden chicken"
+	desc = "It's a golden chicken. Huh."
+	icon_state = "chicken_gold"
+	icon_living = "chicken_gold"
+	icon_dead = "chicken_gold_dead"
+	butcher_results = list(/obj/item/reagent_containers/food/snacks/meat/slab/chicken = 2, /obj/item/stack/sheet/mineral/gold = 5)
+	egg_type = /obj/item/reagent_containers/food/snacks/egg/gold
+	food_type = list(/obj/item/stack/sheet/mineral/gold)
+	health = 30
+	maxHealth = 30
+	validColors = list("gold")
 
 /obj/item/udder
 	name = "udder"
